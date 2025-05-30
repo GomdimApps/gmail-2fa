@@ -29,6 +29,6 @@ func ConnectDatabase() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 
-	fmt.Println("Database connection successfully opened")
+	log.Println("Database connection successfully opened")
 	DB = database
 }

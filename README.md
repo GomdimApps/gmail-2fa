@@ -1,6 +1,26 @@
+## Para iniciar o ambiente de produção:
+```bash
+docker compose --profile prod up -d
+```
+
+### Para derrubar o ambiente de produção:
+```bash
+docker compose --profile prod down
+```
+
 ## Migrações de Banco de Dados
 
 Este projeto utiliza o `golang-migrate` para gerenciar as alterações no esquema do banco de dados. As migrações são arquivos SQL localizados no diretório `database/migrations`.
+
+### Migrações Automáticas na Inicialização da Aplicação
+
+O arquivo `main.go` está configurado para executar automaticamente quaisquer migrações "up" pendentes quando a aplicação inicia.
+Quando a aplicação é executada dentro de um container Docker (conforme definido no `Dockerfile`):
+1.  O `Dockerfile` copia o diretório `database/migrations` do seu projeto para dentro da imagem do container (para `/app/database/migrations/` por padrão, se `WORKDIR` for `/app`).
+2.  A aplicação, ao iniciar dentro do container, utiliza os detalhes de conexão do banco de dados e a variável de ambiente `MIGRATIONS_PATH` (especificados no arquivo `.env` e passados para o container) para localizar e aplicar as migrações. O valor de `MIGRATIONS_PATH` deve corresponder ao caminho onde as migrações foram copiadas dentro do container (ex: `database/migrations` se o `WORKDIR` da aplicação for `/app`).
+
+Se as migrações forem aplicadas com sucesso ou se não houver alterações, a aplicação prosseguirá para iniciar o servidor. Se as migrações falharem, a aplicação registrará um erro fatal e será encerrada.
+
 
 ### Instalação da CLI `golang-migrate`
 
@@ -63,11 +83,31 @@ migrate -database "postgres://youruser:yourpassword@localhost:5432/yourdbname?ss
 migrate -database "postgres://youruser:yourpassword@localhost:5432/yourdbname?sslmode=disable" -path database/migrations down -all
 ```
 
-### Migrações Automáticas na Inicialização da Aplicação
+## Endpoints da API
 
-O arquivo `main.go` está configurado para executar automaticamente quaisquer migrações "up" pendentes quando a aplicação inicia.
-Quando a aplicação é executada dentro de um container Docker (conforme definido no `Dockerfile`):
-1.  O `Dockerfile` copia o diretório `database/migrations` do seu projeto para dentro da imagem do container (para `/app/database/migrations/` por padrão, se `WORKDIR` for `/app`).
-2.  A aplicação, ao iniciar dentro do container, utiliza os detalhes de conexão do banco de dados e a variável de ambiente `MIGRATIONS_PATH` (especificados no arquivo `.env` e passados para o container) para localizar e aplicar as migrações. O valor de `MIGRATIONS_PATH` deve corresponder ao caminho onde as migrações foram copiadas dentro do container (ex: `database/migrations` se o `WORKDIR` da aplicação for `/app`).
+### Clientes
 
-Se as migrações forem aplicadas com sucesso ou se não houver alterações, a aplicação prosseguirá para iniciar o servidor. Se as migrações falharem, a aplicação registrará um erro fatal e será encerrada.
+#### `POST /v1/clients/create`
+
+Cria um novo cliente.
+
+**Corpo da Requisição:**
+```json
+{
+  "name": "Nome do Cliente",
+  "email": "cliente@exemplo.com",
+  "password": "senhaSegura123"
+}
+```
+
+#### `POST /v1/clients/login`
+
+Autentica um cliente.
+
+**Corpo da Requisição:**
+```json
+{
+  "email": "cliente@exemplo.com",
+  "password": "senhaSegura123"
+}
+```

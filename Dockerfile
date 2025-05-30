@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 
+ENV GODEBUG=netdns=go
 RUN go mod download
 
 COPY . .
