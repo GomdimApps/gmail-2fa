@@ -8,14 +8,16 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /app/gmail App/*.go
+RUN go build -o /app/gmail *.go
 
 FROM alpine:3.19
 
+WORKDIR /app
+
+COPY database/migrations ./database/migrations/
+
+COPY --from=build /app/gmail /app/gmail
+
 EXPOSE 8080
 
-RUN mkdir -p /usr/local/bin/ /server/ 
-
-COPY --from=build /app/gmail /server/gmail
-
-CMD ["/server/gmail"]
+CMD ["/app/gmail"]

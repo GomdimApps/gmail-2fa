@@ -65,4 +65,9 @@ migrate -database "postgres://youruser:yourpassword@localhost:5432/yourdbname?ss
 
 ### Migrações Automáticas na Inicialização da Aplicação
 
-O arquivo `main.go` está configurado para executar automaticamente quaisquer migrações "up" pendentes quando a aplicação inicia. Ele utiliza os detalhes de conexão do banco de dados e o `MIGRATIONS_PATH` especificados no arquivo `.env`. Se as migrações forem aplicadas com sucesso ou se não houver alterações, a aplicação prosseguirá para iniciar o servidor. Se as migrações falharem, a aplicação registrará um erro fatal e será encerrada.
+O arquivo `main.go` está configurado para executar automaticamente quaisquer migrações "up" pendentes quando a aplicação inicia.
+Quando a aplicação é executada dentro de um container Docker (conforme definido no `Dockerfile`):
+1.  O `Dockerfile` copia o diretório `database/migrations` do seu projeto para dentro da imagem do container (para `/app/database/migrations/` por padrão, se `WORKDIR` for `/app`).
+2.  A aplicação, ao iniciar dentro do container, utiliza os detalhes de conexão do banco de dados e a variável de ambiente `MIGRATIONS_PATH` (especificados no arquivo `.env` e passados para o container) para localizar e aplicar as migrações. O valor de `MIGRATIONS_PATH` deve corresponder ao caminho onde as migrações foram copiadas dentro do container (ex: `database/migrations` se o `WORKDIR` da aplicação for `/app`).
+
+Se as migrações forem aplicadas com sucesso ou se não houver alterações, a aplicação prosseguirá para iniciar o servidor. Se as migrações falharem, a aplicação registrará um erro fatal e será encerrada.
