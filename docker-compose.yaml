@@ -1,0 +1,36 @@
+services:
+
+  # Services production
+  db:
+    profiles: ["prod"]
+    image: postgres:16.8-alpine3.20
+    container_name: gmail-database
+    restart: always
+    shm_size: 1024mb
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    networks:
+      gmail_network:
+        ipv4_address: 10.10.0.2
+
+  gmail_server:
+    profiles: ["prod"]
+    build: .
+    container_name: gmail-server-01
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      gmail_network:
+        ipv4_address: 10.10.0.3
+
+networks:
+  gmail_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.0.0/29
