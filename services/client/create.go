@@ -25,6 +25,7 @@ func CreateClient(input CreateClientInput) (*model.Client, error) {
 		Name:     input.Name,
 		Email:    input.Email,
 		Password: string(hashedPassword),
+		Role:     "client",
 	}
 
 	if err := database.DB.Create(&client).Error; err != nil {

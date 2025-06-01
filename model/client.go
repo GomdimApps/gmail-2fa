@@ -11,6 +11,7 @@ type Client struct {
 	Name      string         `gorm:"not null" json:"name"`
 	Email     string         `gorm:"unique;not null" json:"email"`
 	Password  string         `gorm:"not null" json:"-"`
+	Role      string         `gorm:"not null;default:'client'" json:"role"` // Added Role field
 	CreatedAt time.Time      `json:"createdAt"`
 	UpdatedAt time.Time      `json:"updatedAt"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deletedAt,omitempty"`

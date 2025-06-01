@@ -10,8 +10,9 @@ func RegisterRoutes(router *gin.Engine) {
 	{
 		clientRoutes := v1.Group("/clients")
 		{
-			clientRoutes.POST("/create", client.CreateClientHandler)
 			clientRoutes.POST("/login", client.LoginClientHandler)
+			// clientRoutes.POST("/create", AuthMiddleware(), client.CreateClientHandler)
+			clientRoutes.POST("/create", client.CreateClientHandler)
 		}
 	}
 }

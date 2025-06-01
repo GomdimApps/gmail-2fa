@@ -102,7 +102,7 @@ Cria um novo cliente.
 
 #### `POST /v1/clients/login`
 
-Autentica um cliente.
+Autentica um cliente e retorna um token JWT.
 
 **Corpo da Requisição:**
 ```json

@@ -2,10 +2,12 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/GomdimApps/gmail-2fa/database"
 	"github.com/GomdimApps/gmail-2fa/model"
+	"github.com/GomdimApps/gmail-2fa/util"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -48,5 +50,21 @@ func LoginClientHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "login successful", "clientId": loggedInClient.ID})
+	// Generate JWT token
+	token, err := util.GenerateUserToken(fmt.Sprintf("%d", loggedInClient.ID), loggedInClient.Email, loggedInClient.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token", "details": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "login successful",
+		"token":   token,
+		"client": gin.H{
+			"id":    loggedInClient.ID,
+			"name":  loggedInClient.Name,
+			"email": loggedInClient.Email,
+			"role":  loggedInClient.Role,
+		},
+	})
 }
